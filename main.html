@@ -16,7 +16,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #1a1a1a;
             color: #fff;
-            /* Запрещаем скролл всего сайта */
             height: 100vh; 
             overflow: hidden; 
             display: flex;
@@ -24,7 +23,7 @@
         }
 
         header {
-            height: 70px; /* Фиксированная высота шапки */
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -42,46 +41,76 @@
         /* --- ГЛАВНАЯ СЕТКА --- */
         .layout-grid {
             display: grid;
-            /* 8 колонок: 1 фото | 6 видео | 1 фото */
             grid-template-columns: minmax(60px, 120px) repeat(6, 1fr) minmax(60px, 120px); 
-            /* 5 строк: Верх | 3 средних | Низ */
-            /* Все строки равны (1fr), но верх/низ можно сделать чуть меньше */
             grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
             gap: 8px;
-            padding: 10px 20px 20px 20px;
-            /* Сетка занимает всю высоту экрана минус шапка */
+            padding: 25px 20px 25px 20px; 
             height: calc(100vh - 70px); 
             width: 100%;
         }
 
+        /* --- ЭФФЕКТ КИНОПЛЕНКИ --- */
+        .film-strip {
+            position: relative;
+            display: grid;
+            grid-column: 1 / 9;
+            grid-template-columns: minmax(60px, 120px) repeat(6, 1fr) minmax(60px, 120px);
+            gap: 8px;
+            z-index: 1;
+        }
+
+        .film-strip::before,
+        .film-strip::after {
+            content: "";
+            position: absolute;
+            left: -10px;
+            right: -10px;
+            height: 20px;
+            background-color: #000;
+            z-index: 10;
+            background-image: repeating-linear-gradient(to right, transparent, transparent 8px, #ffff 8px, #ffff 16px);
+            background-size: 16px 10px;
+            background-repeat: repeat-x;
+            background-position: center;
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .film-strip::before { top: -12px; }
+        .film-strip::after { bottom: -12px; }
+
+        .top-film { grid-row: 1; }
+        .bottom-film { grid-row: 5; }
+
         /* --- СТИЛИ ДЛЯ ФОТО --- */
         .photo-item {
             background-color: #333;
-            border-radius: 4px;
+            border-radius: 2px;
             overflow: hidden;
             position: relative;
             border: 1px solid #444;
             transition: 0.3s;
             width: 100%;
-            height: 100%; /* Фото заполняет свою ячейку */
+            height: 100%; 
         }
 
         .photo-item:hover {
             border-color: #d4af37;
             transform: scale(1.02);
-            z-index: 10;
+            z-index: 20;
         }
 
         .photo-item img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Обрезает фото, чтобы оно влезло без искажений */
+            object-fit: cover;
             display: block;
         }
 
-        /* --- СТИЛИ ДЛЯ ВИДЕО --- */
+        /* ====================================================
+           БЛОК ЦЕНТРА (ВМЕСТО ВИДЕО - ФОТО С ТЕКСТОМ)
+           ==================================================== */
         .video-container {
-            /* Видео занимает центральные 6 колонок и 3 строки */
             grid-column: 2 / 8; 
             grid-row: 2 / 5;    
             background-color: #000;
@@ -89,109 +118,154 @@
             border-radius: 6px;
             overflow: hidden;
             width: 100%;
-            height: 100%; /* Заполняет пространство */
+            height: 100%; 
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            /* Убрали display: flex, так как теперь используем позиционирование */
         }
 
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* Картинка на весь центральный блок */
+        .video-container img {
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover; /* Картинка заполнит весь блок */
+            display: block;
         }
 
-        /* --- РАСПОЛОЖЕНИЕ ФОТО --- */
-        
-        /* ВЕРХНИЙ РЯД (8 фото) */
-        .top-row-1 { grid-column: 1; grid-row: 1; }
-        .top-row-2 { grid-column: 2; grid-row: 1; }
-        .top-row-3 { grid-column: 3; grid-row: 1; }
-        .top-row-4 { grid-column: 4; grid-row: 1; }
-        .top-row-5 { grid-column: 5; grid-row: 1; }
-        .top-row-6 { grid-column: 6; grid-row: 1; }
-        .top-row-7 { grid-column: 7; grid-row: 1; }
-        .top-row-8 { grid-column: 8; grid-row: 1; }
+        /* Текст поверх картинки */
+        .text-overlay {
+            position: absolute;
+            
+            /* --- КООРДИНАТЫ ТЕКСТА --- */
+            /* top и left в процентах показывают, где находится центр текста */
+            /* 50% / 50% = ровно по центру. Можешь менять на 20%, 80% и т.д. */
+            top: 50%; 
+            left: 50%; 
+            
+            /* Эта строчка центрирует текст относительно указанных координат */
+            transform: translate(-50%, -50%); 
+            
+            /* --- СТИЛИ ТЕКСТА --- */
+            color: #ffffff; 
+            font-size: 2rem; /* Размер шрифта */
+            font-weight: bold;
+            text-align: center; /* Выравнивание текста по центру */
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9); /* Тень для читаемости */
+            
+            /* Чтобы текст не прилипал к краям, если он длинный */
+            width: 90%; 
+            pointer-events: none; /* Чтобы текст не мешал кликать по фото */
+        }
 
-        /* ЛЕВАЯ КОЛОНКА (3 фото) */
+        /* --- РАСПОЛОЖЕНИЕ ФОТО ВНУТРИ ПЛЕНОК --- */
+        .top-row-1 { grid-column: 1; }
+        .top-row-2 { grid-column: 2; }
+        .top-row-3 { grid-column: 3; }
+        .top-row-4 { grid-column: 4; }
+        .top-row-5 { grid-column: 5; }
+        .top-row-6 { grid-column: 6; }
+        .top-row-7 { grid-column: 7; }
+        .top-row-8 { grid-column: 8; }
+
+        .bottom-row-1 { grid-column: 1; }
+        .bottom-row-2 { grid-column: 2; }
+        .bottom-row-3 { grid-column: 3; }
+        .bottom-row-4 { grid-column: 4; }
+        .bottom-row-5 { grid-column: 5; }
+        .bottom-row-6 { grid-column: 6; }
+        .bottom-row-7 { grid-column: 7; }
+        .bottom-row-8 { grid-column: 8; }
+
         .left-col-1 { grid-column: 1; grid-row: 2; }
         .left-col-2 { grid-column: 1; grid-row: 3; }
         .left-col-3 { grid-column: 1; grid-row: 4; }
 
-        /* ПРАВАЯ КОЛОНКА (3 фото) */
         .right-col-1 { grid-column: 8; grid-row: 2; }
         .right-col-2 { grid-column: 8; grid-row: 3; }
         .right-col-3 { grid-column: 8; grid-row: 4; }
 
-        /* НИЖНИЙ РЯД (8 фото) */
-        .bottom-row-1 { grid-column: 1; grid-row: 5; }
-        .bottom-row-2 { grid-column: 2; grid-row: 5; }
-        .bottom-row-3 { grid-column: 3; grid-row: 5; }
-        .bottom-row-4 { grid-column: 4; grid-row: 5; }
-        .bottom-row-5 { grid-column: 5; grid-row: 5; }
-        .bottom-row-6 { grid-column: 6; grid-row: 5; }
-        .bottom-row-7 { grid-column: 7; grid-row: 5; }
-        .bottom-row-8 { grid-column: 8; grid-row: 5; }
-
-        /* --- ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ (чтобы не ломалось) --- */
+        /* --- ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ --- */
         @media (max-width: 900px) {
             body { overflow: auto; height: auto; }
             .layout-grid { 
                 display: flex; 
                 flex-direction: column; 
                 height: auto; 
+                padding: 10px;
             }
-            .photo-item { display: none; }
-            .video-container { height: 250px; }
+            .film-strip, .left-col-1, .left-col-2, .left-col-3, .right-col-1, .right-col-2, .right-col-3 { 
+                display: none; 
+            }
+            .video-container { height: 300px; }
+            .text-overlay { font-size: 1.2rem; } /* Уменьшаем текст на телефонах */
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>Хроника Афганской войны</h1>
+        <h1>У каждого времени свои герои</h1>
     </header>
 
     <div class="layout-grid">
 
-        <!-- ВЕРХНИЙ РЯД (8 фото) -->
-        <div class="photo-item top-row-1"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Soviet_troops_in_Afghanistan.jpg/640px-Soviet_troops_in_Afghanistan.jpg" alt="1"></div>
-        <div class="photo-item top-row-2"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Afghanistan_1988.jpg/640px-Afghanistan_1988.jpg" alt="2"></div>
-        <div class="photo-item top-row-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Evstafiev-afghan-soldier.jpg/640px-Evstafiev-afghan-soldier.jpg" alt="3"></div>
-        <div class="photo-item top-row-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bridge_of_friendship_afghanistan.jpg/640px-Bridge_of_friendship_afghanistan.jpg" alt="4"></div>
-        <div class="photo-item top-row-5"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Afghan_guerrillas.jpg/640px-Afghan_guerrillas.jpg" alt="5"></div>
-        <div class="photo-item top-row-6"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Afghanistan_1986.jpg/640px-Afghanistan_1986.jpg" alt="6"></div>
-        <div class="photo-item top-row-7"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Soviet_troops_in_Afghanistan.jpg/640px-Soviet_troops_in_Afghanistan.jpg" alt="7"></div>
-        <div class="photo-item top-row-8"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Afghanistan_1988.jpg/640px-Afghanistan_1988.jpg" alt="8"></div>
-
-        <!-- ЛЕВАЯ КОЛОНКА (3 фото) -->
-        <div class="photo-item left-col-1"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Evstafiev-afghan-soldier.jpg/640px-Evstafiev-afghan-soldier.jpg" alt="9"></div>
-        <div class="photo-item left-col-2"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bridge_of_friendship_afghanistan.jpg/640px-Bridge_of_friendship_afghanistan.jpg" alt="10"></div>
-        <div class="photo-item left-col-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Afghan_guerrillas.jpg/640px-Afghan_guerrillas.jpg" alt="11"></div>
-
-        <!-- ЦЕНТР (ВИДЕО) -->
-        <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1" title="Видео" allowfullscreen></iframe>
+        <!-- ВЕРХНИЙ РЯД -->
+        <div class="film-strip top-film">
+            <div class="photo-item top-row-1"><img src="images/Рисунок3.jpg" alt="1"></div>
+            <div class="photo-item top-row-2"><img src="images/Рисунок4.jpg" alt="2"></div>
+            <div class="photo-item top-row-3"><img src="images/Рисунок5.jpg" alt="3"></div>
+            <div class="photo-item top-row-4"><img src="images/Рисунок6.jpg" alt="4"></div>
+            <div class="photo-item top-row-5"><img src="images/Рисунок7.jpg" alt="5"></div>
+            <div class="photo-item top-row-6"><img src="images/Рисунок8.jpg" alt="6"></div>
+            <div class="photo-item top-row-7"><img src="images/Рисунок9.png" alt="7"></div>
+            <div class="photo-item top-row-8"><img src="images/Снимок экрана 2026-11-05 135411.png" alt="8"></div>
         </div>
 
-        <!-- ПРАВАЯ КОЛОНКА (3 фото) -->
-        <div class="photo-item right-col-1"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Afghanistan_1986.jpg/640px-Afghanistan_1986.jpg" alt="12"></div>
-        <div class="photo-item right-col-2"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Soviet_troops_in_Afghanistan.jpg/640px-Soviet_troops_in_Afghanistan.jpg" alt="13"></div>
-        <div class="photo-item right-col-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Afghanistan_1988.jpg/640px-Afghanistan_1988.jpg" alt="14"></div>
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <div class="photo-item left-col-1"><img src="images/a71b8d34009ec7965c7612f60010b2d0.jpg" alt="9"></div>
+        <div class="photo-item left-col-2"><img src="images/Рисунок13.jpg" alt="10"></div>
+        <div class="photo-item left-col-3"><img src="" alt="11"></div>
 
-        <!-- НИЖНИЙ РЯД (8 фото) -->
-        <div class="photo-item bottom-row-1"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Evstafiev-afghan-soldier.jpg/640px-Evstafiev-afghan-soldier.jpg" alt="15"></div>
-        <div class="photo-item bottom-row-2"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bridge_of_friendship_afghanistan.jpg/640px-Bridge_of_friendship_afghanistan.jpg" alt="16"></div>
-        <div class="photo-item bottom-row-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Afghan_guerrillas.jpg/640px-Afghan_guerrillas.jpg" alt="17"></div>
-        <div class="photo-item bottom-row-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Afghanistan_1986.jpg/640px-Afghanistan_1986.jpg" alt="18"></div>
-        <div class="photo-item bottom-row-5"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Soviet_troops_in_Afghanistan.jpg/640px-Soviet_troops_in_Afghanistan.jpg" alt="19"></div>
-        <div class="photo-item bottom-row-6"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Afghanistan_1988.jpg/640px-Afghanistan_1988.jpg" alt="20"></div>
-        <div class="photo-item bottom-row-7"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Evstafiev-afghan-soldier.jpg/640px-Evstafiev-afghan-soldier.jpg" alt="21"></div>
-        <div class="photo-item bottom-row-8"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Bridge_of_friendship_afghanistan.jpg/640px-Bridge_of_friendship_afghanistan.jpg" alt="22"></div>
+        <!-- ЦЕНТР (ФОТО ВМЕСТО ВИДЕО) -->
+        <!-- ЦЕНТР (ФОТО ВМЕСТО ВИДЕО) -->
+        <div class="video-container">
+            
+            <!-- Обертка для двух фото, чтобы они стояли в ряд -->
+            <div style="display: flex; width: 100%; height: 100%; position: relative;">
+                
+                <!-- Первое фото (занимает 60% ширины) -->
+                <img src="images/ecf495422fc6e85283a896efde28f845.jpg" alt="Центральное фото" 
+                     style="width: 60%; height: 100%; object-fit: cover; object-position: left;">
+                
+                <!-- Второе фото (занимает 40% ширины) -->
+                <img src="images/Снимок экрана 2026-11-05 143418.png" alt="Второе фото" 
+                     style="width: 40%; height: 100%; object-fit: cover; object-position: left;">
+					 
+				<div class="text-overlay">
+					Хроника Афганской войны глазами очевидца
+				</div>
+                                         
+            </div>
+            
+            <!-- Текст поверх (он останется по центру) -->
+            
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <div class="photo-item right-col-1"><img src="images/Снимок экрана 2026-11-05 135100.png" alt="12"></div>
+        <div class="photo-item right-col-2"><img src="images/Рисунок10.jpg" alt="13"></div>
+        <div class="photo-item right-col-3"><img src="images/Рисунок12.jpg" alt="14"></div>
+
+        <!-- НИЖНИЙ РЯД -->
+        <div class="film-strip bottom-film">
+            <div class="photo-item bottom-row-1"><img src="images/Рисунок13.jpg" alt="15"></div>
+            <div class="photo-item bottom-row-2"><img src="images/Рисунок14.jpg" alt="16"></div>
+            <div class="photo-item bottom-row-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Afghan_guerrillas.jpg/640px-Afghan_guerrillas.jpg" alt="17"></div>
+            <div class="photo-item bottom-row-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Afghanistan_1986.jpg/640px-Afghanistan_1986.jpg" alt="18"></div>
+            <div class="photo-item bottom-row-5"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Soviet_troops_in_Afghanistan.jpg/640px-Soviet_troops_in_Afghanistan.jpg" alt="19"></div>
+            <div class="photo-item bottom-row-6"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Afghanistan_1988.jpg/640px-Afghanistan_1988.jpg" alt="20"></div>
+            <div class="photo-item bottom-row-7"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Evstafiev-afghan-soldier.jpg/640px-Evstafiev-afghan-soldier.jpg" alt="21"></div>
+            <div class="photo-item bottom-row-8"><img src="images/Рисунок11.jpg" alt="22"></div>
+        </div>
 
     </div>
 
